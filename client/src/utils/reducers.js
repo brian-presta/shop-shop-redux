@@ -24,9 +24,9 @@ export function reducer(state,action) {
         case CLEAR_CART:
             return {...state, cart:[], cartOpen: false}
         case ADD_TO_CART: 
-            return {...state, cart:[...state.cart, action.cart], cartOpen: true}
+            return {...state, cart:[...state.cart, action.product], cartOpen: true}
         case ADD_MULTIPLE_TO_CART:
-            return {...state, cart:[...state.cart, ...action.cart]}
+            return {...state, cart:[...state.cart, ...action.products]}
         case REMOVE_FROM_CART:
             let newCart = state.cart.filter(item => item._id !== action._id)
             return {...state, cart: newCart, cartOpen: newCart.length > 0}
