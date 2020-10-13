@@ -1,14 +1,33 @@
 import {
 UPDATE_PRODUCTS,
 UPDATE_CATEGORIES,
-UPDATE_CURRENT_CATEGORY
+UPDATE_CURRENT_CATEGORY,
+ADD_MULTIPLE_TO_CART,
+ADD_TO_CART,
+REMOVE_FROM_CART,
+UPDATE_CART_QUANTITY,
+CLEAR_CART,
+TOGGLE_CART
 } from '../utils/actions';
 import { reducer } from '../utils/reducers'
 
 const initialState = {
     products: [],
     categories: [{name:'Food'}],
-    currentCategory: '1'
+    currentCategory: '1',
+    cart: [
+        {
+            _id: 1,
+            name: "Soup",
+            purchaseQuantity: 2
+        },
+        {
+            _id: 2,
+            name: 'Bread',
+            purchaseQuantity: 1
+        }
+    ],
+    cartOpen: false
 }
 
 test('UPDATE_PRODUCTS', () => {
@@ -38,3 +57,78 @@ test('UPDATE_CURRENT_CATEGORY', function() {
     expect(initialState.currentCategory).toBe('1')
     expect(newState.currentCategory).toBe('2')
 })
+
+test('TOGGLE_CART', () => {
+    let newState = reducer(initialState, {
+        type: TOGGLE_CART
+    })
+    expect(initialState.cartOpen).toBe(false)
+    expect(newState.cartOpen).toBe(true)
+})
+
+test('CLEAR_CART', () => {
+    let newState = reducer(initialState, {
+        type: CLEAR_CART
+    })
+    expect(initialState.cart.length).toBe(2)
+    expect(newState.cart.length).toBe(0)
+})
+
+test('ADD_TO_CART', () => {
+    let newState = reducer(initialState, {
+        type: ADD_TO_CART,
+        cart: {
+            _id: 2,
+            name: 'bread',
+            purchaseQuantity: 1
+        }
+    })
+    expect(initialState.cart.length).toBe(2)
+    expect(newState.cart.length).toBe(3)
+})
+
+test('ADD_MULTIPLE_TO_CART', () => {
+    let newState = reducer(initialState, {
+        type: ADD_MULTIPLE_TO_CART,
+        cart: [
+            {
+                _id: 3,
+                name: 'apple',
+                purchaseQuantity: 1
+            },
+            {
+                _id: 4,
+                name: 'pineapple',
+                purchaseQuantity: 1
+            }
+        ]
+    })
+    expect(initialState.cart.length).toBe(2)
+    expect(newState.cart.length).toBe(4)
+})
+test('REMOVE_FROM_CART', () => {
+    let newState = reducer(initialState, {
+        type: REMOVE_FROM_CART,
+        _id: 1
+    })
+    expect(initialState.cart.length).toBe(2)
+    expect(newState.cart.length).toBe(1)
+})
+test('UPDATE_CART_QUANTITY', () => {
+    console.log(initialState.cart[0])
+    let newState = reducer(initialState, {
+        type: UPDATE_CART_QUANTITY,
+        _id: 1,
+        purchaseQuantity: 4
+        
+    })
+    console.log(initialState.cart[0])
+    expect(initialState.cart[0].purchaseQuantity).toBe(2)
+    expect(newState.cart[0].purchaseQuantity).toBe(4)
+})
+// ADD_MULTIPLE_TO_CART,
+// ADD_TO_CART,
+// REMOVE_FROM_CART,
+// UPDATE_CART_QUANTITY,
+// CLEAR_CART,
+// TOGGLE_CART
