@@ -7,6 +7,7 @@ import { useStoreContext } from '../utils/GlobalState'
 import { QUERY_PRODUCTS } from "../utils/queries";
 import spinner from '../assets/spinner.gif'
 import Cart from "../components/Cart";
+import { idbPromise } from "../utils/helpers";
 
 function Detail() {
   const { id } = useParams();
@@ -20,8 +21,15 @@ function Detail() {
         type: UPDATE_PRODUCTS,
         products: data.products
       })
+      data.products.forEach( product => {
+        idbPromise('products', 'put', product)
+      })
+    } else if (!loading) {
+      idbPromise('products','get').then( products => {
+        dispatch({type: UPDATE_PRODUCTS, products})
+      })
     }
-  }, [data,dispatch])
+  }, [data,dispatch,loading])
 
   useEffect(() => {
     if (products.length) {
