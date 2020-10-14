@@ -1,25 +1,26 @@
 import React from 'react';
 import { useStoreContext } from '../../utils/GlobalState';
 import { REMOVE_FROM_CART, UPDATE_CART_QUANTITY } from '../../utils/actions'
+import { idbPromise } from '../../utils/helpers';
 
 function CartItem({ item }) {
     const [state, dispatch] = useStoreContext()
+    const { _id } = item
     function removeFromCart() {
-        dispatch({
-            type: REMOVE_FROM_CART,
-            _id: item._id
-        })
+        dispatch({ type: REMOVE_FROM_CART, _id })
+        idbPromise('cart', 'delete', item)
     }
     function quantityChange(event) {
-        const value = parseInt(event.target.value)
-        if (value < 1) {
+        const purchaseQuantity = parseInt(event.target.value)
+        if (purchaseQuantity < 1) {
             removeFromCart()
         } else {
             dispatch({
                 type: UPDATE_CART_QUANTITY,
-                _id: item._id,
-                purchaseQuantity: value
+                _id,
+                purchaseQuantity
             })
+            idbPromise('cart','put',{...item, purchaseQuantity})
         }
     }
     return (

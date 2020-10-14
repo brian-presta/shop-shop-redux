@@ -38,25 +38,28 @@ function Detail() {
   }, [products, id]);
   function addToCart() {
     const itemInCart = cart.find((cartItem) => cartItem._id === id);
-
+    let purchaseQuantity = 1
     if (itemInCart) {
+      purchaseQuantity = parseInt(itemInCart.purchaseQuantity) + 1
       dispatch({
         type: UPDATE_CART_QUANTITY,
         _id: id,
-        purchaseQuantity: parseInt(itemInCart.purchaseQuantity) + 1
+        purchaseQuantity
       });
     } else {
       dispatch({
         type: ADD_TO_CART,
-        product: { ...currentProduct, purchaseQuantity: 1 }
+        product: {...currentProduct, purchaseQuantity}
       });
     }
+    idbPromise('cart', 'put', {...currentProduct, purchaseQuantity})
   }
   function removeFromCart() {
     dispatch({
       type: REMOVE_FROM_CART,
       _id: currentProduct._id
     })
+    idbPromise('cart','delete', currentProduct)
   }
   return (
     <>
