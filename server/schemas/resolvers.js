@@ -61,7 +61,7 @@ const resolvers = {
         const product = await stripe.products.create({
           name: p.name,
           description: p.description,
-          images: [`${url}/images/${products[i].image}`]
+          images: [`${url}/images/${p.image}`]
         })
         const price = await stripe.prices.create({
           product: product.id,
