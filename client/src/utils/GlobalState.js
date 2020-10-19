@@ -1,12 +1,10 @@
 import React from 'react'
-import store from './store'
 import Provider from 'react-redux'
-const StoreContext = createContext()
+import { createStore } from 'redux'
+import reducer from './reducers'
 
-const { Provider } = StoreContext
 
-export default function StoreProvider({...props}) {
-    
-    return <Provider store={store} {...props} />
-}
+const store = createStore(reducer) 
+export default  StoreProvider = ({...props}) => <Provider store={store} {...props} />
+
 
