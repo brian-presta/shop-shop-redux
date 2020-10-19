@@ -4,7 +4,7 @@ import { useLazyQuery } from '@apollo/react-hooks'
 import CartItem from './CartItem'
 import Auth from '../../utils/auth'
 import './style.css'
-import { useStoreContext } from '../../utils/GlobalState'
+import { useSelector, useDispatch } from 'react-redux'
 import { ADD_MULTIPLE_TO_CART, TOGGLE_CART } from '../../utils/actions'
 import { idbPromise } from '../../utils/helpers'
 import { QUERY_CHECKOUT } from '../../utils/queries'
@@ -12,17 +12,19 @@ import { QUERY_CHECKOUT } from '../../utils/queries'
 const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
 function Cart() {
     
-    const [state, dispatch] = useStoreContext()
+    const dispatch = useDispatch()
+    const cart = useSelector( state => state.cart)
+    const cartOpen = useSelector( state => state.cartOpen)
     const [getCheckout, { data }] = useLazyQuery(QUERY_CHECKOUT)
     useEffect(() => {
         async function getCart() {
-            const cart = await idbPromise('cart','get')
-            dispatch({ type: ADD_MULTIPLE_TO_CART, products: cart })
+            const indexedCart = await idbPromise('cart','get')
+            dispatch({ type: ADD_MULTIPLE_TO_CART, products: indexedCart })
         }
-        if (!state.cart.length) {
+        if (!cart.length) {
             getCart()
         }
-    }, [state.cart.length, dispatch])
+    }, [cart.length, dispatch])
     useEffect(() => {
         if (data) {
             stripePromise.then( res => {
@@ -38,7 +40,7 @@ function Cart() {
     }
     function calculateTotal() {
         let sum = 0
-        for (const item of state.cart) {
+        for (const item of cart) {
             sum += item.price * item.purchaseQuantity
         }
         return sum.toFixed(2)
@@ -46,7 +48,7 @@ function Cart() {
     function submitCheckout() {
         const productIds = []
 
-        for (const item of state.cart) {
+        for (const item of cart) {
             let quantity = item.purchaseQuantity
             while (quantity > 0) {
                 productIds.push(item._id)
@@ -57,7 +59,7 @@ function Cart() {
             variables: { products: productIds }
         })
     }
-    if (!state.cartOpen) {
+    if (!cartOpen) {
         return (
             <div className="cart-closed" onClick={toggleCart}>
               <span
@@ -70,9 +72,9 @@ function Cart() {
         <div className="cart">
             <div className="close" onClick={toggleCart}>[close]</div>
             <h2>Shopping Cart</h2>
-            {state.cart.length ? (
+            {cart.length ? (
                 <div>
-                {state.cart.map(item => (
+                {cart.map(item => (
                     <CartItem key={item._id} item={item} />
                 ))}
                 <div className="flex-row space-between">
